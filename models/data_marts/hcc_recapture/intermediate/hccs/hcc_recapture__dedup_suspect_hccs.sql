@@ -8,7 +8,7 @@ with base as (
         person_id
         , payer
         , data_source
-        , {{ date_part('year', 'sus.recorded_date') }} as collection_year
+        , {{ date_part('year', 'recorded_date') }} as collection_year
         , recorded_date
         , model_version
         , claim_id
