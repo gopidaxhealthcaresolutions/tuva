@@ -38,7 +38,7 @@ with seed_hcc_hierarchy as (
 
     union all
 
-    select * from {{ ref('hcc_recapture__dedup_suspect_hccs') }}
+    select * from {{ ref('hcc_recapture__int_suspect_hccs') }}
 )
 
 -- NOTE: Distinct is to remove different recording dates + ICD 10 codes for the same HCC code
