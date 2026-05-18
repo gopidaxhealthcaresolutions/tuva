@@ -287,3 +287,4 @@ models:
               - claim_id
               - hcc_code
               - model_version
+              - collection_year
