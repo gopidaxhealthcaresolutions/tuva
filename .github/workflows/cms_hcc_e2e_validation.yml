@@ -1,0 +1,58 @@
+name: CMS-HCC E2E Validation
+
+# Runs the CMS-HCC end-to-end risk-score validation whenever the HCC marts or
+# their coefficient seeds change. The validation pins known inputs to
+# hand-computed expected risk scores (see
+# models/data_marts/cms_hcc/cms_hcc__patient_risk_scores_unit_tests.yml), so any
+# regression in the scoring math or the v24/v28 transition schedule fails CI.
+#
+# Runs on a local DuckDB database, so it needs no warehouse credentials and
+# works on fork pull requests.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "models/data_marts/cms_hcc/**"
+      - "seeds/value_sets/cms_hcc/**"
+  workflow_dispatch:
+
+concurrency:
+  group: cms-hcc-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cms_hcc_validation:
+    name: CMS-HCC risk-score validation on DuckDB
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: "3.10"
+      DBT_CORE_VERSION: "1.10.15"
+      DUCKDB_VERSION: "1.4.1"
+      DBT_PROJECT_DIR: "./integration_tests"
+      # A local DuckDB file is enough for unit tests (no MotherDuck token needed).
+      DBT_MOTHERDUCK_CI_PATH: "cms_hcc_ci.duckdb"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb duckdb==${{ env.DUCKDB_VERSION }}
+
+      - name: Install dbt dependencies
+        run: dbt deps --profiles-dir ./integration_tests/profiles/duckdb
+
+      - name: Run CMS-HCC risk-score validation unit tests
+        run: >
+          dbt test
+          --select "tag:cms_hcc,test_type:unit"
+          --profiles-dir ./integration_tests/profiles/duckdb

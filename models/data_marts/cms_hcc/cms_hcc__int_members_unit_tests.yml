@@ -8,6 +8,7 @@ unit_tests:
     model: cms_hcc__int_members
     config:
       enabled: "{{ var('claims_enabled', False) | as_bool }}"
+      tags: ['cms_hcc']
     overrides:
       vars:
         tuva_last_run: '2024-01-01 00:00:00'
