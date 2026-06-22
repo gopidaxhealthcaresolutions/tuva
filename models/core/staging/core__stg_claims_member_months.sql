@@ -12,7 +12,7 @@ with final_before_attribution_fields as (
     , a.year_month
     , a.payer
     , a.{{ quote_column('plan') }}
-    {{ select_extension_columns(ref('core__int_member_months'), alias='a') }}
+    {{ select_extension_columns(ref('core__int_member_months'), alias='a', strip_prefix=false) }}
     , a.data_source
   from {{ ref('core__int_member_months') }} as a
 )
@@ -33,7 +33,7 @@ select
   , b.custom_attributed_provider_practice
   , b.custom_attributed_provider_organization
   , b.custom_attributed_provider_lob
-  {{ select_extension_columns(ref('core__int_member_months'), alias='a') }}
+  {{ select_extension_columns(ref('core__int_member_months'), alias='a', strip_prefix=false) }}
   , a.data_source
 
 from final_before_attribution_fields as a

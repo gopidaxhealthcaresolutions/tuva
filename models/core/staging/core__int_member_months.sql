@@ -12,7 +12,7 @@ with stg_eligibility as (
     , enrollment_start_date
     , enrollment_end_date
     , tuva_last_run
-    {{ select_extension_columns(ref('normalized__eligibility'), alias='elig') }}
+    {{ select_extension_columns(ref('normalized__eligibility'), alias='elig', strip_prefix=false) }}
     , data_source
   from {{ ref('normalized__eligibility') }} as elig
 )
@@ -35,7 +35,7 @@ select distinct
   , a.payer
   , a.{{ quote_column('plan') }}
   , a.tuva_last_run
-  {{ select_extension_columns(ref('normalized__eligibility'), alias='a') }}
+  {{ select_extension_columns(ref('normalized__eligibility'), alias='a', strip_prefix=false) }}
   , a.data_source
 from stg_eligibility as a
 inner join month_start_and_end_dates as b
