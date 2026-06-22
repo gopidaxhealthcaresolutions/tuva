@@ -31,6 +31,11 @@ unit_tests:
       enabled: "{{ var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', false))) | as_bool }}"
     overrides:
       vars:
+        # Pin the passthrough config so the test is hermetic and does not break
+        # when a project configures a non-default prefix or strip setting.
+        passthrough:
+          prefix: 'x_'
+          strip: false
         _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
     given:
       - input: ref('normalized__eligibility')
@@ -82,6 +87,11 @@ unit_tests:
       enabled: "{{ var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool }}"
     overrides:
       vars:
+        # Pin the passthrough config so the test is hermetic and does not break
+        # when a project configures a non-default prefix or strip setting.
+        passthrough:
+          prefix: 'x_'
+          strip: false
         _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
     given:
       - input: ref('core__stg_claims_member_months')
